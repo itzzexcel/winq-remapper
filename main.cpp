@@ -3,8 +3,8 @@
 #include <filesystem>
 
 // Proudly engineered by Excel
-// https://github.com/itzzexcel/winq-remapper
 // Licensed under the MIT License
+// https://github.com/itzzexcel/winq-remapper
 
 HHOOK kbHook;
 boolean wKeyPressed = false;
