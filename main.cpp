@@ -2,7 +2,7 @@
 #include <string>
 #include <filesystem>
 
-// Proudly engineered by Excel
+// Proudly engineered by itzzexcel
 // Licensed under the MIT License
 // https://github.com/itzzexcel/winq-remapper
 
@@ -98,28 +98,3 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UnhookWindowsHookEx(kbHook);
 	return 0;
 }
-
-// Never worked part
-// void DisableWindowsSearchShortcut()
-// {
-//     HKEY hKey;
-//     DWORD dwValue = 1;
-
-//     if (RegCreateKeyExW(HKEY_CURRENT_USER,
-//         L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-//         0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS)
-//     {
-//         RegSetValueExW(hKey, L"DisableSearchBoxSuggestions", 0, REG_DWORD,
-//             (BYTE*)&dwValue, sizeof(dwValue));
-//         RegCloseKey(hKey);
-//     }
-
-//     if (RegCreateKeyExW(HKEY_LOCAL_MACHINE,
-//         L"SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search",
-//         0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS)
-//     {
-//         RegSetValueExW(hKey, L"AllowCortana", 0, REG_DWORD,
-//             (BYTE*)&dwValue, sizeof(dwValue));
-//         RegCloseKey(hKey);
-//     }
-// }
