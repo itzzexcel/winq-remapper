@@ -1,5 +1,5 @@
 # winq-remapper
-A simple C++ executable that **remaps the Windows Q key to close the current Window, same as some Hyprland configurations**
+A simple C++ executable that **remaps the Windows Q key to close the current Window, same as some Hyprland configurations**.
 
 ## Features
 - Automatically puts itself in the startup folder
@@ -8,5 +8,5 @@ A simple C++ executable that **remaps the Windows Q key to close the current Win
 - No configuration required
 - Uninstall argument (`--uninstall`)
 
-## To-Dos
+## TODOs
 - [ ] Fix sometimes Windows Search appearing when pressing the shortcut
