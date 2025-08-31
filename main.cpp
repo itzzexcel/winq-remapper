@@ -2,7 +2,7 @@
 #include <string>
 #include <filesystem>
 
-// Proudly engineered by Excel
+// Proudly engineered by Excel (itzzexcel@github)
 // Licensed under the MIT License
 // https://github.com/itzzexcel/winq-remapper
 
