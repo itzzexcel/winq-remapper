@@ -2,7 +2,7 @@
 #include <string>
 #include <filesystem>
 
-// Proudly engineered by Excel (itzzexcel@github)
+// Proudly engineered by Excel
 // Licensed under the MIT License
 // https://github.com/itzzexcel/winq-remapper
 
@@ -99,6 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	return 0;
 }
 
+// Never worked part
 // void DisableWindowsSearchShortcut()
 // {
 //     HKEY hKey;
