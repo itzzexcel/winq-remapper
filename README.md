@@ -10,3 +10,5 @@ A simple C++ executable that **remaps the Windows Q key to close the current Win
 
 ## TODOs
 - [ ] Fix sometimes Windows Search appearing when pressing the shortcut
+
+[Under the MIT License](LICENSE)
