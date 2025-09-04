@@ -269,19 +269,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		HKEY hKey;
 		RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
 		
-		std::wstring exePath = std::filesystem::absolute(std::filesystem::path(__argv[0])).wstring();
-		std::wstring cmdLine = L"\"" + exePath + L"\" " + wideCmdLine;
-		
-		print("[DEBUG] Command line: %ls", cmdLine.c_str());
-		
-		if (RegSetValueExW(hKey, L"winqremapper", 0, REG_SZ, (BYTE*)cmdLine.c_str(), (cmdLine.size() + 1) * sizeof(wchar_t)) == ERROR_SUCCESS)
-		{
-			print("[DEBUG] Registry key set successfully.");
-		}
-		else
-		{
-			print("[DEBUG] Failed to set registry key.");
-		}
+        wchar_t exePath[MAX_PATH];
+        if (GetModuleFileNameW(NULL, exePath, MAX_PATH) == 0) {
+            print("[DEBUG] Invalid executable path");
+            return 1;
+        }
+
+        if (!std::filesystem::exists(exePath)) {
+            print("[DEBUG] Invalid executable path");
+            return 1;
+        }
+
+        std::wstring cmdLine = L"\"" + std::wstring(exePath) + L"\"";
+        if (!wideCmdLine.empty()) {
+            if (wideCmdLine.find_first_of(L"&|<>^") == std::wstring::npos) {
+                cmdLine += L" " + wideCmdLine;
+            }
+        }
+
+        print("[DEBUG] Command line: %ls", cmdLine.c_str());
+
+        DWORD result = RegSetValueExW(
+            hKey,
+            L"winqremapper",
+            0,
+            REG_SZ,
+            reinterpret_cast<const BYTE*>(cmdLine.c_str()),
+            static_cast<DWORD>((cmdLine.size() + 1) * sizeof(wchar_t))
+        );
+
+        if (result == ERROR_SUCCESS) {
+            print("[DEBUG] Registry key set successfully.");
+        } else {
+            print("[DEBUG] Failed to set registry key.");
+        }
 		
 		RegCloseKey(hKey);
 		
