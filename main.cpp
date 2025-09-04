@@ -196,9 +196,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CloseHandle(processSnapshot);
 	}
 	
-	// Command line arguments
 	std::wstring wideCmdLine = GetCommandLineW();
-	// Quita el primer argumento (ruta del exe)
 	size_t firstSpace = wideCmdLine.find(L' ');
 	if (firstSpace != std::wstring::npos) {
 		wideCmdLine = wideCmdLine.substr(firstSpace + 1);
