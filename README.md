@@ -13,8 +13,15 @@ g++ -std=c++20 -static -mwindows -o winq-remapper.exe main.cpp -luser32 -ladvapi
 - Lightweight (~0.7MB Memory Usage)
 - No configuration required
 - Uninstall argument (`--uninstall`)
+- Debug argument (`--debug`)
+- Mode argument (`--mode <mode>`)
+  - `default` (default)
+  - `hover` (can close the current hovered window)
+  - `hovfocus` (focuses the window when you hover above it)
 
 ## TODOs
 - [ ] Fix sometimes Windows Search appearing when pressing the shortcut
+- [ ] Add task scheduler implementation
+- [ ] Make it able to close elevated applications such as the regedit
 
 [Under the MIT License](LICENSE)
