@@ -12,8 +12,11 @@ g++ -std=c++20 -static -mwindows -o winq-remapper.exe main.cpp -luser32 -ladvapi
 - No elevation required
 - Lightweight (~0.7MB Memory Usage)
 - No configuration required
-- Uninstall argument (`--uninstall`)
+
+## Arguments
 - Debug argument (`--debug`)
+
+- Uninstall argument (`--uninstall`)
 - Mode argument (`--mode <mode>`)
   - `default` (default)
   - `hover` (can close the current hovered window)
