@@ -26,4 +26,6 @@ g++ -std=c++20 -static -mwindows -o winq-remapper.exe main.cpp -luser32 -ladvapi
 - [ ] Add task scheduler implementation
 - [ ] Make it able to close elevated applications such as the regedit
 
+<hr>
+
 [Under the MIT License](LICENSE)
