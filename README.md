@@ -15,7 +15,6 @@ g++ -std=c++20 -static -mwindows -o winq-remapper.exe main.cpp -luser32 -ladvapi
 
 ## Arguments
 - Debug argument (`--debug`)
-
 - Uninstall argument (`--uninstall`)
 - Mode argument (`--mode <mode>`)
   - `default` (default)
