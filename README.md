@@ -19,7 +19,7 @@ g++ -std=c++20 -static -mwindows -o winq-remapper.exe main.cpp -luser32 -ladvapi
 - Mode argument (`--mode <mode>`)
   - `default` (default)
   - `hover` (can close the current hovered window)
-  - `hovfocus` (focuses the window when you hover above it)
+  - `hovfocus` (**WIP**: focuses the window when you hover above it)
 
 ## TODOs
 - [ ] Fix sometimes Windows Search appearing when pressing the shortcut
