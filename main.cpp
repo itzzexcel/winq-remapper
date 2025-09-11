@@ -1,3 +1,7 @@
+// Proudly engineered by itzzexcel
+// Licensed under the MIT License
+// https://github.com/itzzexcel/winq-remapper
+
 #include <Windows.h>
 #include <string>
 #include <filesystem>
@@ -5,13 +9,7 @@
 #include <unordered_map>
 #include <tlhelp32.h>
 
-// Proudly engineered by itzzexcel
-// Licensed under the MIT License
-// https://github.com/itzzexcel/winq-remapper
-
-#define print(...)       \
-printf(__VA_ARGS__); \
-printf("\n");
+#define print(...) printf(__VA_ARGS__); printf("\n");
 
 std::wstring mode = L"default";
 
