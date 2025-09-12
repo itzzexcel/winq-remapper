@@ -82,7 +82,11 @@ void CheckHoverWindowChange() {
             }
         } 
         lastHoverWindow = currentHover;
-            print("[DEBUG] Hover changed to HWND: 0x%p | Class: %s | Title: %s", currentHover, className, windowTitle);
+            std::string trimmedTitle(windowTitle);
+            if (trimmedTitle.length() > 45) {
+                trimmedTitle = trimmedTitle.substr(0, 45) + "...";
+            }
+            print("[DEBUG] HWND: 0x%p | Class: %s | Title: %s", currentHover, className, trimmedTitle.c_str());
     }
 }
 

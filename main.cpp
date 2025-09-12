@@ -28,8 +28,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     if (processSnapshot != INVALID_HANDLE_VALUE) {
         if (Process32FirstW(processSnapshot, &processEntry)) {
             do {
-                if (_wcsicmp(processEntry.szExeFile, L"winq-remapper.exe") == 0 &&
-                    processEntry.th32ProcessID != currentProcessId) {
+                if (_wcsicmp(processEntry.szExeFile, L"winq-remapper.exe") == 0 && processEntry.th32ProcessID != currentProcessId 
+                ||  _wcsicmp(processEntry.szExeFile, L"wnq-rmp.exe") == 0 && processEntry.th32ProcessID != currentProcessId) {
                     HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processEntry.th32ProcessID);
                     if (hProcess != nullptr) {
                         TerminateProcess(hProcess, 0);

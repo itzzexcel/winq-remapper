@@ -35,9 +35,9 @@ bool Uninstall() {
         RegCloseKey(hKey);
     }
     if (success)
-        MessageBoxW(NULL, L"Removed from startup.", L"Uninstall Complete", MB_OK | MB_ICONINFORMATION);
+        MessageBoxExA(NULL, "Removed from startup.", "Uninstall Complete", MB_OK | MB_ICONINFORMATION, 0);
     else
-        MessageBoxW(NULL, L"Failed to remove from startup.", L"Uninstall Failed", MB_OK | MB_ICONERROR);
+        MessageBoxExA(NULL, "Failed to remove from startup.", "Uninstall Failed", MB_OK | MB_ICONERROR, 0);
     return success;
 }
 

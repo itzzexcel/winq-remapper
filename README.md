@@ -4,7 +4,7 @@ A simple C++ executable that **remaps the Windows + Q key to close the current W
 ## Compiling
 I did use GCC to compile this project but MSVC in *Visual Studio Console Project* works too!
 ```
-g++ -std=c++23 -static -mwindows -o winq-remapper.exe main.cpp -luser32 -ladvapi32
+g++ -std=c++23 -static -mwindows -o wnq-rmp.exe main.cpp -luser32 -ladvapi32
 ```
 
 ## Features
