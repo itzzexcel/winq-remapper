@@ -2,7 +2,7 @@
 A simple C++ executable that **remaps the Windows + Q key to close the current Window, same as some Hyprland configurations**.
 
 ## Compiling
-I did use GCC to compile this project but MSVC in *Visual Studio Console Project* works too!
+Must compile using **GCC** from mingw64.
 ```
 g++ -std=c++23 -static -mwindows -o wnq-rmp.exe main.cpp -luser32 -ladvapi32
 ```
