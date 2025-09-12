@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <unordered_map>
+#include <wctype.h>
 
 std::wstring mode = L"default";
 bool hoverSetting = false;
@@ -38,40 +39,89 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         CloseHandle(processSnapshot);
     }
 
-    // cmd argument parser
-    std::wstring wideCmdLine = GetCommandLineW();
-    size_t firstSpace = wideCmdLine.find(L' ');
-    if (firstSpace != std::wstring::npos) {
-        wideCmdLine = wideCmdLine.substr(firstSpace + 1);
-    } else {
-        wideCmdLine = L"";
+// cmd argument parser - wide string version
+std::wstring wideCmdLine = GetCommandLineW();
+size_t firstSpace = wideCmdLine.find(L' ');
+if (firstSpace != std::wstring::npos) {
+    wideCmdLine = wideCmdLine.substr(firstSpace + 1);
+} else {
+    wideCmdLine = L"";
+}
+
+// Help check
+if (wideCmdLine.find(L"--help") != std::wstring::npos) {
+    if (!AttachConsole(ATTACH_PARENT_PROCESS)) {
+        AllocConsole();
     }
+    freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
+    
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
+    
+    print("Usage: winq-remapper.exe [--debug] [--mode <hover|hovfocus|default>] [--uninstall]");
 
-    if (strstr(lpCmdLine, "--uninstall") != NULL)
-        return Uninstall() ? 0 : 1;
+    SetConsoleTextAttribute(hConsole, 7);    
+    return 0;
+}
 
-    if (strstr(lpCmdLine, "--debug") != NULL)
-        isDebugMode = true;
 
-    if (strstr(lpCmdLine, "--mode") != NULL) {
-        std::unordered_map<std::wstring, int> modeMap = {
-            {L"hover", 1},
-            {L"hovfocus", 2},
-            {L"default", 3}
-        };
-        mode = wideCmdLine.substr(wideCmdLine.find(L"--mode=") + 8);
-        switch (modeMap[mode]) {
-            case 1: hoverSetting = true; mode = L"hover"; break;
-            case 2: hoverwFocusSetting = true; mode = L"hovfocus"; break;
-            default: hoverwFocusSetting = false; hoverSetting = false; mode = L"default"; break;
+// Uninstall check
+if (wideCmdLine.find(L"--uninstall") != std::wstring::npos) {
+    return Uninstall() ? 0 : 1;
+}
+
+// Debug check
+if (wideCmdLine.find(L"--debug") != std::wstring::npos) {
+    isDebugMode = true;
+}
+
+// Mode parsing
+if (wideCmdLine.find(L"--mode") != std::wstring::npos) {
+    std::wstring modeValue = L"default";
+    
+    // Check for --mode=value format
+    size_t modePos = wideCmdLine.find(L"--mode=");
+    if (modePos != std::wstring::npos) {
+        size_t valueStart = modePos + 7; // Length of "--mode="
+        size_t valueEnd = wideCmdLine.find(L' ', valueStart);
+        if (valueEnd == std::wstring::npos) {
+            valueEnd = wideCmdLine.length();
+        }
+        modeValue = wideCmdLine.substr(valueStart, valueEnd - valueStart);
+    } else {
+        // Check for --mode value format (space separated)
+        modePos = wideCmdLine.find(L"--mode");
+        if (modePos != std::wstring::npos) {
+            size_t valueStart = modePos + 6; // Length of "--mode"
+            // Skip whitespace
+            while (valueStart < wideCmdLine.length() && iswspace(wideCmdLine[valueStart])) {
+                valueStart++;
+            }
+            if (valueStart < wideCmdLine.length()) {
+                size_t valueEnd = wideCmdLine.find(L' ', valueStart);
+                if (valueEnd == std::wstring::npos) {
+                    valueEnd = wideCmdLine.length();
+                }
+                modeValue = wideCmdLine.substr(valueStart, valueEnd - valueStart);
+            }
         }
     }
-
-    if (strstr(lpCmdLine, "--help")) {
-        print("Usage: winq-remapper.exe [--debug] [--mode <hover|hovfocus|default>] [--uninstall]");
-        return 0;
+    
+    // Apply mode settings
+    if (modeValue == L"hover") {
+        hoverSetting = true;
+        hoverwFocusSetting = false;
+        mode = L"hover";
+    } else if (modeValue == L"hovfocus") {
+        hoverSetting = false;
+        hoverwFocusSetting = true;
+        mode = L"hovfocus";
+    } else {
+        hoverSetting = false;
+        hoverwFocusSetting = false;
+        mode = L"default";
     }
-
+}
     // Debug console setup
     if (isDebugMode) {
         if (GetConsoleWindow() == NULL) {

@@ -21,18 +21,18 @@ static HWND GetCurrentMouseHoverWindow() {
             HWND mainWindow = hwnd;
             HWND parent;
             while ((parent = GetParent(mainWindow)) != NULL)
-                mainWindow = parent;
+            mainWindow = parent;
             if (mainWindow == hwnd) {
                 HWND owner = GetWindow(hwnd, GW_OWNER);
                 if (owner != NULL)
-                    mainWindow = owner;
+                mainWindow = owner;
             }
             return mainWindow;
         }
     } else {
         HWND hwnd = GetForegroundWindow();
         if (hwnd)
-            return hwnd;
+        return hwnd;
     }
     return NULL;
 }
@@ -52,10 +52,12 @@ void SetForegroundWindowForced(HWND hWnd) {
 
 void CheckHoverWindowChange() {
     HWND currentHover = GetCurrentMouseHoverWindow();
+    
+    char windowTitle[256] = {0};
+    char className[256] = {0};
+
     if (currentHover != lastHoverWindow) {
         if (currentHover) {
-            char windowTitle[256] = {0};
-            char className[256] = {0};
             GetWindowTextA(currentHover, windowTitle, 255);
             GetClassNameA(currentHover, className, 255);
             if (hoverwFocusSetting) {
@@ -66,7 +68,8 @@ void CheckHoverWindowChange() {
                     POINT cursorPos;
                     GetCursorPos(&cursorPos);
                     if (PtInRect(&windowRect, cursorPos)) {
-                        // Hacky workaround for focus
+                        
+                        // Hacky thing
                         HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, [](int code, WPARAM wp, LPARAM lp) -> LRESULT {
                             return CallNextHookEx(NULL, code, wp, lp);
                         }, GetModuleHandle(NULL), 0);
@@ -75,13 +78,9 @@ void CheckHoverWindowChange() {
                     }
                 }
             }
-            if (isDebugMode)
-                print("[DEBUG] Hover changed to HWND: 0x%p | Class: %s | Title: %s", currentHover, className, windowTitle);
-        } else {
-            if (isDebugMode)
-                print("[DEBUG] Hover changed to NULL");
-        }
+        } 
         lastHoverWindow = currentHover;
+            print("[DEBUG] Hover changed to HWND: 0x%p | Class: %s | Title: %s", currentHover, className, windowTitle);
     }
 }
 

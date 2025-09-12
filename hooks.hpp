@@ -30,7 +30,7 @@ bool Uninstall() {
     HKEY hKey;
     bool success = false;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
-        if (RegDeleteValueW(hKey, L"winqremapper") == ERROR_SUCCESS)
+        if (RegDeleteValueW(hKey, L"winq/rmp") == ERROR_SUCCESS)
             success = true;
         RegCloseKey(hKey);
     }
@@ -58,8 +58,7 @@ void RegisterStartup(HINSTANCE hInstance, const std::wstring& wideCmdLine) {
         }
     }
 
-    if (isDebugMode)
-        print("[DEBUG] Command line: %ls", cmdLine.c_str());
+    print("[DEBUG] Command line: %ls", cmdLine.c_str());
 
     DWORD result = RegSetValueExW(
         hKey,
@@ -71,11 +70,9 @@ void RegisterStartup(HINSTANCE hInstance, const std::wstring& wideCmdLine) {
     );
 
     if (result == ERROR_SUCCESS) {
-        if (isDebugMode)
-            print("[DEBUG] Registry key set successfully.");
+        print("[DEBUG] Registry key set successfully.");
     } else {
-        if (isDebugMode)
-            print("[DEBUG] Failed to set registry key.");
+        print("[DEBUG] Failed to set registry key.");
     }
 
     RegCloseKey(hKey);
