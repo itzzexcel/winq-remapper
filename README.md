@@ -14,17 +14,15 @@ g++ -std=c++23 -static -mwindows -o wnq-rmp.exe main.cpp -luser32 -ladvapi32
 - No configuration required
 
 ## Arguments
-- Debug argument (`--debug`)
-- Uninstall argument (`--uninstall`)
 - Mode argument (`--mode <mode>`)
   - `default` (default)
   - `hover` (can close the current hovered window)
   - `hovfocus` (**WIP**: focuses the window when you hover above it)
+- Uninstall argument (`--uninstall`)
+- Debug argument (`--debug`)
 
 ## TODOs
-- [ ] Fix sometimes Windows Search appearing when pressing the shortcut
-- [ ] Add task scheduler implementation
-- [ ] Make it able to close elevated applications such as the regedit
+- [ ] Add task scheduler implementation (high priority)
 
 <hr>
 
