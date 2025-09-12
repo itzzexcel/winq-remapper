@@ -27,5 +27,8 @@ g++ -std=c++23 -static -mwindows -o wnq-rmp.exe main.cpp -luser32 -ladvapi32
 - [ ] Make it able to close elevated applications such as the regedit
 
 <hr>
-
 [Under the MIT License](LICENSE)
+
+<hr/>
+
+— Made with love by Excel. <3
