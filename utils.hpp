@@ -6,10 +6,12 @@
 #define print(...) printf(__VA_ARGS__); printf("\n");
 
 extern std::wstring mode;
+
 extern bool hoverSetting;
 extern bool hoverwFocusSetting;
 extern bool isDebugMode;
 extern bool wKeyPressed;
+
 extern HWND lastHoverWindow;
 
 static HWND GetCurrentMouseHoverWindow() {

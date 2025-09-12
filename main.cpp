@@ -1,5 +1,5 @@
 // Proudly engineered by itzzexcel
-// Licensed under the MIT License
+// Under the MIT License
 // https://github.com/itzzexcel/winq-remapper
 
 #include "hooks.hpp"
@@ -9,11 +9,13 @@
 #include <wctype.h>
 
 std::wstring mode = L"default";
+
 bool hoverSetting = false;
 bool hoverwFocusSetting = false;
 bool isDebugMode = false;
-HHOOK kbHook;
 bool wKeyPressed = false;
+
+HHOOK kbHook;
 HWND lastHoverWindow = NULL;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
