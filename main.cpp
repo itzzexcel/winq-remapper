@@ -130,7 +130,6 @@ if (wideCmdLine.find(L"--mode") != std::wstring::npos) {
             AllocConsole();
             freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
         }
-        print("[DEBUG] Starting winq-remapper with hover detection...");
         print("[DEBUG] Mode: %ls", mode.c_str());
         print("[DEBUG] Hover setting: %d", hoverSetting);
         print("[DEBUG] Hover with focus setting: %d", hoverwFocusSetting);
