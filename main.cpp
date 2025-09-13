@@ -41,7 +41,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         CloseHandle(processSnapshot);
     }
 
-// cmd argument parser - wide string version
+// cmd argument parser
 std::wstring wideCmdLine = GetCommandLineW();
 size_t firstSpace = wideCmdLine.find(L' ');
 if (firstSpace != std::wstring::npos) {
@@ -50,7 +50,7 @@ if (firstSpace != std::wstring::npos) {
     wideCmdLine = L"";
 }
 
-// Help check
+// Help arg
 if (wideCmdLine.find(L"--help") != std::wstring::npos) {
     if (!AttachConsole(ATTACH_PARENT_PROCESS)) {
         AllocConsole();
@@ -67,21 +67,21 @@ if (wideCmdLine.find(L"--help") != std::wstring::npos) {
 }
 
 
-// Uninstall check
+// Uninstall arg
 if (wideCmdLine.find(L"--uninstall") != std::wstring::npos) {
     return Uninstall() ? 0 : 1;
 }
 
-// Debug check
+// Debug arg
 if (wideCmdLine.find(L"--debug") != std::wstring::npos) {
     isDebugMode = true;
 }
 
-// Mode parsing
+// Mode arg
 if (wideCmdLine.find(L"--mode") != std::wstring::npos) {
     std::wstring modeValue = L"default";
     
-    // Check for --mode=value format
+    // Check for --mode=value
     size_t modePos = wideCmdLine.find(L"--mode=");
     if (modePos != std::wstring::npos) {
         size_t valueStart = modePos + 7; // Length of "--mode="
@@ -91,7 +91,7 @@ if (wideCmdLine.find(L"--mode") != std::wstring::npos) {
         }
         modeValue = wideCmdLine.substr(valueStart, valueEnd - valueStart);
     } else {
-        // Check for --mode value format (space separated)
+        // Check for --mode value format
         modePos = wideCmdLine.find(L"--mode");
         if (modePos != std::wstring::npos) {
             size_t valueStart = modePos + 6; // Length of "--mode"
