@@ -96,5 +96,6 @@
         "cerrno": "cpp",
         "climits": "cpp",
         "queue": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "C:/mingw64/bin/g++.exe"
 }
