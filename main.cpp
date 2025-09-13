@@ -149,9 +149,6 @@ if (wideCmdLine.find(L"--mode") != std::wstring::npos) {
 
     SetTimer(NULL, 1, 50, HoverTimerProc);
 
-    if (isDebugMode && mode == L"hover")
-        print("[DEBUG] Setup complete. Move mouse around to see hover detection.");
-
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);

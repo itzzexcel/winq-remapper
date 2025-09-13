@@ -30,7 +30,7 @@ bool Uninstall() {
     HKEY hKey;
     bool success = false;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
-        if (RegDeleteValueW(hKey, L"winq/rmp") == ERROR_SUCCESS)
+        if (RegDeleteValueW(hKey, L"winqremapper") == ERROR_SUCCESS)
             success = true;
         RegCloseKey(hKey);
     }
@@ -46,7 +46,7 @@ void RegisterStartup(HINSTANCE hInstance, const std::wstring& wideCmdLine) {
     RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
 
     wchar_t exePath[MAX_PATH];
-    if (GetModuleFileNameW(NULL, exePath, MAX_PATH) == 0) {
+    if (GetModuleFileNameW(NULL, exePath, MAX_PATH) == NULL) {
         print("[DEBUG] Invalid executable path");
         return;
     }
