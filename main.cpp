@@ -52,10 +52,7 @@ if (firstSpace != std::wstring::npos) {
 
 // Help arg
 if (wideCmdLine.find(L"--help") != std::wstring::npos) {
-    if (!AttachConsole(ATTACH_PARENT_PROCESS)) {
-        AllocConsole();
-    }
-    freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
+    AttachToConsole();
     
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
@@ -64,6 +61,10 @@ if (wideCmdLine.find(L"--help") != std::wstring::npos) {
 
     SetConsoleTextAttribute(hConsole, 7);    
     return 0;
+}
+
+if (wideCmdLine.find(L"--attach") != std::wstring::npos) {
+    AttachToConsole();
 }
 
 

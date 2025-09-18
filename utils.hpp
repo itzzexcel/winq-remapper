@@ -93,6 +93,14 @@ void CheckHoverWindowChange() {
     }
 }
 
+// Attach to console
+void AttachToConsole() {
+    if (!AttachConsole(ATTACH_PARENT_PROCESS)) {
+        AllocConsole();
+    }
+    freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
+}
+
 VOID CALLBACK HoverTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
     CheckHoverWindowChange();
 }
