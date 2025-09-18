@@ -1,3 +1,6 @@
+#ifndef UTILS_HPP
+#define UTILS_HPP
+
 #include <Windows.h>
 #include <TlHelp32.h>
 #include <string>
@@ -93,3 +96,5 @@ void CheckHoverWindowChange() {
 VOID CALLBACK HoverTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
     CheckHoverWindowChange();
 }
+
+#endif // UTILS_HPP

@@ -2,11 +2,11 @@
 // Under the MIT License
 // https://github.com/itzzexcel/winq-remapper
 
-#include "hooks.hpp"
-
 #include <filesystem>
 #include <unordered_map>
 #include <wctype.h>
+
+#include "hooks.hpp"
 
 std::wstring mode = L"default";
 

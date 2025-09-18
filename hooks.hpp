@@ -1,3 +1,6 @@
+#ifndef HOOKS_HPP
+#define HOOKS_HPP
+
 #include "utils.hpp"
 
 extern HHOOK kbHook;
@@ -77,3 +80,5 @@ void RegisterStartup(HINSTANCE hInstance, const std::wstring& wideCmdLine) {
 
     RegCloseKey(hKey);
 }
+
+#endif // HOOKS_HPP
