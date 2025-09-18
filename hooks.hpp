@@ -22,8 +22,11 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
             wKeyPressed)
         {
             HWND hwnd = GetCurrentMouseHoverWindow();
-            if (hwnd)
-                PostMessage(hwnd, WM_CLOSE, 0, 0);
+            if (hwnd) {
+                if (!PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0)) {
+                    PostMessage(hwnd, WM_CLOSE, 0, 0);
+                }
+            }
             keybd_event(VK_LWIN, 0, 0, 0);
             keybd_event(VK_BACK, 0, 0, 0);
             wKeyPressed = false;
