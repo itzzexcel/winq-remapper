@@ -5,10 +5,13 @@
 
 extern HHOOK kbHook;
 
-LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    if (nCode == HC_ACTION) {
+LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode == HC_ACTION)
+    {
         KBDLLHOOKSTRUCT *kbStruct = (KBDLLHOOKSTRUCT *)lParam;
-        if (kbStruct->vkCode == VK_LWIN || kbStruct->vkCode == VK_RWIN) {
+        if (kbStruct->vkCode == VK_LWIN || kbStruct->vkCode == VK_RWIN)
+        {
             if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
                 wKeyPressed = true;
             else if (wParam == WM_KEYUP || wParam == WM_SYSKEYUP)
@@ -16,7 +19,8 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
         }
         if ((kbStruct->vkCode == 'Q' || kbStruct->vkCode == 'q') &&
             (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) &&
-            wKeyPressed) {
+            wKeyPressed)
+        {
             HWND hwnd = GetCurrentMouseHoverWindow();
             if (hwnd)
                 PostMessage(hwnd, WM_CLOSE, 0, 0);
@@ -29,14 +33,17 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(kbHook, nCode, wParam, lParam);
 }
 
-bool Uninstall() {
+bool Uninstall()
+{
     HKEY hKey;
     bool success = false;
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS) {
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_WRITE, &hKey) == ERROR_SUCCESS)
+    {
         if (RegDeleteValueW(hKey, L"winqremapper") == ERROR_SUCCESS)
             success = true;
         RegCloseKey(hKey);
     }
+
     if (success)
         MessageBoxExA(NULL, "Removed from startup.", "Uninstall Complete", MB_OK | MB_ICONINFORMATION, 0);
     else
@@ -44,19 +51,24 @@ bool Uninstall() {
     return success;
 }
 
-void RegisterStartup(HINSTANCE hInstance, const std::wstring& wideCmdLine) {
+void RegisterStartup(HINSTANCE hInstance, const std::wstring &wideCmdLine)
+{
     HKEY hKey;
     RegCreateKeyExW(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL);
 
     wchar_t exePath[MAX_PATH];
-    if (GetModuleFileNameW(NULL, exePath, MAX_PATH) == 0) {
+
+    if (GetModuleFileNameW(NULL, exePath, MAX_PATH) == 0)
+    {
         print("[DEBUG] Invalid executable path");
         return;
     }
 
     std::wstring cmdLine = L"\"" + std::wstring(exePath) + L"\"";
-    if (!wideCmdLine.empty()) {
-        if (wideCmdLine.find_first_of(L"&|<>^") == std::wstring::npos) {
+    if (!wideCmdLine.empty())
+    {
+        if (wideCmdLine.find_first_of(L"&|<>^") == std::wstring::npos)
+        {
             cmdLine += L" " + wideCmdLine;
         }
     }
@@ -68,15 +80,10 @@ void RegisterStartup(HINSTANCE hInstance, const std::wstring& wideCmdLine) {
         L"winqremapper",
         0,
         REG_SZ,
-        reinterpret_cast<const BYTE*>(cmdLine.c_str()),
-        static_cast<DWORD>((cmdLine.size() + 1) * sizeof(wchar_t))
-    );
+        reinterpret_cast<const BYTE *>(cmdLine.c_str()),
+        static_cast<DWORD>((cmdLine.size() + 1) * sizeof(wchar_t)));
 
-    if (result == ERROR_SUCCESS) {
-        print("[DEBUG] Registry key set successfully.");
-    } else {
-        print("[DEBUG] Failed to set registry key.");
-    }
+    print("[DEBUG] %s", (result == ERROR_SUCCESS) ? "Registry key set successfully." : "Failed to set registry key.");
 
     RegCloseKey(hKey);
 }
