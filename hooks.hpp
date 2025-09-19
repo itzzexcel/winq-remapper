@@ -5,6 +5,38 @@
 
 extern HHOOK kbHook;
 
+HWND GetAppHost(HWND frameHost) {
+    HWND childWindow = nullptr;
+    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL {
+        HWND* result = (HWND*)lParam;
+        WCHAR className[256];
+        if (GetClassNameW(hwnd, className, 256)) {
+            if (wcscmp(className, L"Windows.UI.Core.CoreWindow") == 0 ||
+                wcscmp(className, L"ApplicationFrameInputSinkWindow") == 0) {
+                *result = hwnd;
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }, (LPARAM)&childWindow);
+    return childWindow;
+}
+
+bool IsApplicationFrameHost(HWND hwnd) {
+    DWORD processId;
+    GetWindowThreadProcessId(hwnd, &processId);
+    HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
+    if (process) {
+        WCHAR processName[MAX_PATH];
+        if (GetModuleBaseNameW(process, nullptr, processName, MAX_PATH)) {
+            CloseHandle(process);
+            return wcscmp(processName, L"ApplicationFrameHost.exe") == 0;
+        }
+        CloseHandle(process);
+    }
+    return false;
+}
+
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION)
@@ -23,8 +55,15 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
         {
             HWND hwnd = GetCurrentMouseHoverWindow();
             if (hwnd) {
-                if (!PostMessage(hwnd, WM_SYSCOMMAND, SC_CLOSE, 0)) {
-                    PostMessage(hwnd, WM_CLOSE, 0, 0);
+                HWND targetWindow = hwnd;
+                if (IsApplicationFrameHost(hwnd)) {
+                    HWND uwpWindow = GetAppHost(hwnd);
+                    if (uwpWindow) {
+                        targetWindow = uwpWindow;
+                    }
+                }
+                if (!PostMessage(targetWindow, WM_SYSCOMMAND, SC_CLOSE, 0)) {
+                    PostMessage(targetWindow, WM_CLOSE, 0, 0);
                 }
             }
             keybd_event(VK_LWIN, 0, 0, 0);
