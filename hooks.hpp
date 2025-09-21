@@ -5,9 +5,11 @@
 
 extern HHOOK kbHook;
 
-HWND GetAppHost(HWND frameHost) {
+HWND GetAppHost(HWND frameHost)
+{
     HWND childWindow = nullptr;
-    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL {
+    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL
+                     {
         HWND* result = (HWND*)lParam;
         WCHAR className[256];
         if (GetClassNameW(hwnd, className, 256)) {
@@ -17,18 +19,20 @@ HWND GetAppHost(HWND frameHost) {
                 return FALSE;
             }
         }
-        return TRUE;
-    }, (LPARAM)&childWindow);
+        return TRUE; }, (LPARAM)&childWindow);
     return childWindow;
 }
 
-bool IsApplicationFrameHost(HWND hwnd) {
+bool IsApplicationFrameHost(HWND hwnd)
+{
     DWORD processId;
     GetWindowThreadProcessId(hwnd, &processId);
     HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
-    if (process) {
+    if (process)
+    {
         WCHAR processName[MAX_PATH];
-        if (GetModuleBaseNameW(process, nullptr, processName, MAX_PATH)) {
+        if (GetModuleBaseNameW(process, nullptr, processName, MAX_PATH))
+        {
             CloseHandle(process);
             return wcscmp(processName, L"ApplicationFrameHost.exe") == 0;
         }
@@ -54,15 +58,22 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
             wKeyPressed)
         {
             HWND hwnd = GetCurrentMouseHoverWindow();
-            if (hwnd) {
+            if (hwnd)
+            {
+                // Comment those lines if you want to remove the AppplicationFrameHost check
+                //////////////////////////////////////////////
                 HWND targetWindow = hwnd;
-                if (IsApplicationFrameHost(hwnd)) {
+                if (IsApplicationFrameHost(hwnd))
+                {
                     HWND uwpWindow = GetAppHost(hwnd);
-                    if (uwpWindow) {
+                    if (uwpWindow)
+                    {
                         targetWindow = uwpWindow;
                     }
                 }
-                if (!PostMessage(targetWindow, WM_SYSCOMMAND, SC_CLOSE, 0)) {
+                //////////////////////////////////////////////
+                if (!PostMessage(targetWindow, WM_SYSCOMMAND, SC_CLOSE, 0))
+                {
                     PostMessage(targetWindow, WM_CLOSE, 0, 0);
                 }
             }

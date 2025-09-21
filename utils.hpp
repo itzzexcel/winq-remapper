@@ -93,7 +93,7 @@ void CheckHoverWindowChange()
 
                         // Hacky thing
                         HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, [](int code, WPARAM wp, LPARAM lp) -> LRESULT
-                                                    { return CallNextHookEx(NULL, code, wp, lp); }, GetModuleHandle(NULL), 0);
+                                                        { return CallNextHookEx(NULL, code, wp, lp); }, GetModuleHandle(NULL), 0);
                         SetForegroundWindow(currentHover);
                         UnhookWindowsHookEx(hook);
                     }
