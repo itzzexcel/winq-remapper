@@ -103,7 +103,8 @@
         "source_location": "cpp",
         "shared_mutex": "cpp",
         "stdfloat": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "*.ipp": "cpp"
     },
     "C_Cpp.default.compilerPath": "C:/mingw64/bin/g++.exe"
 }

@@ -14,6 +14,7 @@ bool hoverSetting = false;
 bool hoverwFocusSetting = false;
 bool isDebugMode = false;
 bool wKeyPressed = false;
+bool enableForceKeybind = false;
 
 HHOOK kbHook;
 HWND lastHoverWindow = NULL;
@@ -75,6 +76,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     if (wideCmdLine.find(L"--attach") != std::wstring::npos)
         AttachToConsole();
+
+    if (wideCmdLine.find(L"--enable-force-keybind") != std::wstring::npos)
+        enableForceKeybind = true;
 
     // Uninstall arg
     if (wideCmdLine.find(L"--uninstall") != std::wstring::npos)

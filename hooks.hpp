@@ -8,8 +8,7 @@ extern HHOOK kbHook;
 HWND GetAppHost(HWND frameHost)
 {
     HWND childWindow = nullptr;
-    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL
-                     {
+    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL {
         HWND* result = (HWND*)lParam;
         WCHAR className[256];
         if (GetClassNameW(hwnd, className, 256)) {
@@ -39,6 +38,28 @@ bool IsApplicationFrameHost(HWND hwnd)
         CloseHandle(process);
     }
     return false;
+}
+
+
+bool IsTargetElevated(DWORD pid)
+{
+    HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+    if (!hProc)
+        return true;
+
+    HANDLE hToken;
+    bool elevated = false;
+    if (OpenProcessToken(hProc, TOKEN_QUERY, &hToken))
+    {
+        TOKEN_ELEVATION elevation;
+        DWORD size;
+        if (GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &size))
+            elevated = elevation.TokenIsElevated;
+        CloseHandle(hToken);
+    }
+    CloseHandle(hProc);
+
+    return elevated;
 }
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -75,6 +96,38 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
                 if (!PostMessage(targetWindow, WM_SYSCOMMAND, SC_CLOSE, 0))
                 {
                     PostMessage(targetWindow, WM_CLOSE, 0, 0);
+                }
+            }
+            keybd_event(VK_LWIN, 0, 0, 0);
+            keybd_event(VK_BACK, 0, 0, 0);
+            wKeyPressed = false;
+            return 1;
+        }
+        if ((kbStruct->vkCode == 'Q' || kbStruct->vkCode == 'q') &&
+            (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) &&
+            wKeyPressed && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && enableForceKeybind)
+        {
+            HWND hwnd = GetCurrentMouseHoverWindow();
+            if (hwnd)
+            {
+                HWND targetWindow = hwnd;
+                if (IsApplicationFrameHost(hwnd))
+                {
+                    HWND uwpWindow = GetAppHost(hwnd);
+                    if (uwpWindow)
+                    {
+                        targetWindow = uwpWindow;
+                    }
+                }
+                DWORD pid;
+                GetWindowThreadProcessId(targetWindow, &pid);
+                if (IsTargetElevated(pid))
+                {
+                    SetForegroundWindow(targetWindow);
+                    keybd_event(VK_MENU, 0, 0, 0);
+                    keybd_event(VK_F4, 0, 0, 0);
+                    keybd_event(VK_F4, 0, KEYEVENTF_KEYUP, 0);
+                    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0);
                 }
             }
             keybd_event(VK_LWIN, 0, 0, 0);
