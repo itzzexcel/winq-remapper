@@ -19,7 +19,7 @@ g++ -std=c++23 -static -mwindows -o wnq-rmp.exe main.cpp -luser32 -ladvapi32
   - `hover` (can close the current hovered window)
   - `hovfocus` (**WIP**: focuses the window when you hover above it)
 - Force keybind argument (`--enable-force-keybind`)
-  - Can forcely close processes using the `Windows + Shift + Q` key
+  - **WIP**: Can forcely close processes using the `Windows + Shift + Q` key
 - Uninstall argument (`--uninstall`)
 - Debug argument (`--debug`)
 
