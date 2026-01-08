@@ -187,10 +187,6 @@ REQUIREMENTS:
     // Debug console setup
     if (isDebugMode)
     {
-        uintptr_t base = (uintptr_t)GetModuleHandle(nullptr);
-        uintptr_t func = (uintptr_t)&kbHook;
-        uintptr_t offset = func - base;
-
         if (GetConsoleWindow() == NULL)
         {
             AllocConsole();
@@ -202,7 +198,6 @@ REQUIREMENTS:
         print("[DEBUG] Hover setting: %d", hoverSetting);
         print("[DEBUG] Hover with focus setting: %d", hoverwFocusSetting);
         print("[DEBUG] Full command line: %ls", wideCmdLine.c_str());
-        print("[DEBUG] Keyboard hook offset: 0x%p", (void *)offset);
     }
     else
     {

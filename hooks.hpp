@@ -13,8 +13,7 @@ extern HHOOK kbHook;
 HWND GetAppHost(HWND frameHost)
 {
     HWND childWindow = nullptr;
-    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL
-                     {
+    EnumChildWindows(frameHost, [](HWND hwnd, LPARAM lParam) -> BOOL {
         HWND* result = (HWND*)lParam;
         WCHAR className[256];
         if (GetClassNameW(hwnd, className, 256)) {
@@ -46,6 +45,7 @@ bool IsApplicationFrameHost(HWND hwnd)
     return false;
 }
 
+
 bool IsTargetElevated(DWORD pid)
 {
     HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
@@ -72,7 +72,6 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (nCode == HC_ACTION)
     {
         KBDLLHOOKSTRUCT *kbStruct = (KBDLLHOOKSTRUCT *)lParam;
-
         if (kbStruct->vkCode == VK_LWIN || kbStruct->vkCode == VK_RWIN)
         {
             if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)
