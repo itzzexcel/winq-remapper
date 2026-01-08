@@ -18,42 +18,8 @@ extern bool hoverwFocusSetting;
 extern bool isDebugMode;
 extern bool wKeyPressed;
 extern bool enableForceKeybind;
-extern bool dontOverFind;
 
 extern HWND lastHoverWindow;
-
-struct FindHwndData
-{
-    DWORD pid;
-    HWND hwnd;
-};
-
-BOOL CALLBACK EnumProc(HWND hwnd, LPARAM lParam)
-{
-    FindHwndData *data = (FindHwndData *)lParam;
-
-    DWORD pid{};
-    GetWindowThreadProcessId(hwnd, &pid);
-
-    if (pid == data->pid && IsWindowVisible(hwnd))
-    {
-        data->hwnd = hwnd;
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-HWND FindMainWindow(DWORD pid)
-{
-    FindHwndData data{};
-    data.pid = pid;
-    data.hwnd = nullptr;
-
-    EnumWindows(EnumProc, (LPARAM)&data);
-
-    return data.hwnd;
-}
 
 static HWND GetCurrentMouseHoverWindow()
 {
@@ -64,34 +30,17 @@ static HWND GetCurrentMouseHoverWindow()
         HWND hwnd = WindowFromPoint(pt);
         if (hwnd)
         {
-            if (!dontOverFind)
+            HWND mainWindow = hwnd;
+            HWND parent;
+            while ((parent = GetParent(mainWindow)) != NULL)
+                mainWindow = parent;
+            if (mainWindow == hwnd)
             {
-                HWND mainWindow = hwnd;
-                HWND parent;
-                while ((parent = GetParent(mainWindow)) != NULL)
-                    mainWindow = parent;
-                if (mainWindow == hwnd)
-                {
-                    HWND owner = GetWindow(hwnd, GW_OWNER);
-                    if (owner != NULL)
-                        mainWindow = owner;
-                }
-                return mainWindow;
+                HWND owner = GetWindow(hwnd, GW_OWNER);
+                if (owner != NULL)
+                    mainWindow = owner;
             }
-            else
-            {
-                DWORD pid = 0;
-                GetWindowThreadProcessId(hwnd, &pid);
-
-                if (pid != 0)
-                {
-                    HWND mainWindow = FindMainWindow(pid);
-                    if (mainWindow)
-                        return mainWindow;
-                }
-
-                return hwnd;
-            }
+            return mainWindow;
         }
     }
     else
@@ -142,6 +91,7 @@ void CheckHoverWindowChange()
                     GetCursorPos(&cursorPos);
                     if (PtInRect(&windowRect, cursorPos))
                     {
+
                         // Hacky thing
                         HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, [](int code, WPARAM wp, LPARAM lp) -> LRESULT
                                                       { return CallNextHookEx(NULL, code, wp, lp); }, GetModuleHandle(NULL), 0);
