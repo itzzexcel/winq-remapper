@@ -1,7 +1,12 @@
+// Proudly engineered by itzzexcel
+// Under the MIT License
+// https://github.com/itzzexcel/winq-remapper
+
 #ifndef HOOKS_HPP
 #define HOOKS_HPP
 
 #include "utils.hpp"
+#include "svc-comms.hpp"
 
 extern HHOOK kbHook;
 
@@ -82,55 +87,29 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
             HWND hwnd = GetCurrentMouseHoverWindow();
             if (hwnd)
             {
-                // Comment those lines if you want to remove the AppplicationFrameHost check
-                //////////////////////////////////////////////
                 HWND targetWindow = hwnd;
+
                 if (IsApplicationFrameHost(hwnd))
                 {
                     HWND uwpWindow = GetAppHost(hwnd);
                     if (uwpWindow)
-                    {
                         targetWindow = uwpWindow;
+                }
+
+                if (IsWindow(targetWindow))
+                {
+                    if (enableForceKeybind)
+                    {
+                        print("[DEBUG] Sending HWND %p to svc", targetWindow);
+                        SendWindowSync(targetWindow);
+                    }
+                    else
+                    {
+                        PostMessage(targetWindow, WM_CLOSE, 0, 0);
                     }
                 }
-                //////////////////////////////////////////////
-                if (!PostMessage(targetWindow, WM_SYSCOMMAND, SC_CLOSE, 0))
-                {
-                    PostMessage(targetWindow, WM_CLOSE, 0, 0);
-                }
             }
-            keybd_event(VK_LWIN, 0, 0, 0);
-            keybd_event(VK_BACK, 0, 0, 0);
-            wKeyPressed = false;
-            return 1;
-        }
-        if ((kbStruct->vkCode == 'Q' || kbStruct->vkCode == 'q') &&
-            (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) &&
-            wKeyPressed && (GetAsyncKeyState(VK_SHIFT) & 0x8000) && enableForceKeybind)
-        {
-            HWND hwnd = GetCurrentMouseHoverWindow();
-            if (hwnd)
-            {
-                HWND targetWindow = hwnd;
-                if (IsApplicationFrameHost(hwnd))
-                {
-                    HWND uwpWindow = GetAppHost(hwnd);
-                    if (uwpWindow)
-                    {
-                        targetWindow = uwpWindow;
-                    }
-                }
-                DWORD pid;
-                GetWindowThreadProcessId(targetWindow, &pid);
-                if (IsTargetElevated(pid))
-                {
-                    SetForegroundWindow(targetWindow);
-                    keybd_event(VK_MENU, 0, 0, 0);
-                    keybd_event(VK_F4, 0, 0, 0);
-                    keybd_event(VK_F4, 0, KEYEVENTF_KEYUP, 0);
-                    keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, 0);
-                }
-            }
+
             keybd_event(VK_LWIN, 0, 0, 0);
             keybd_event(VK_BACK, 0, 0, 0);
             wKeyPressed = false;
@@ -138,6 +117,38 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
     }
     return CallNextHookEx(kbHook, nCode, wParam, lParam);
+}
+
+bool UninstallService()
+{
+    bool success = false;
+
+    SC_HANDLE scm = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_CONNECT);
+    if (!scm)
+        return false;
+
+    SC_HANDLE svc = OpenServiceW(scm, L"wnq-svc", SERVICE_STOP | DELETE | SERVICE_QUERY_STATUS);
+    if (!svc)
+    {
+        CloseServiceHandle(scm);
+        return false;
+    }
+
+    SERVICE_STATUS status{};
+    ControlService(svc, SERVICE_CONTROL_STOP, &status);
+
+    if (DeleteService(svc))
+        success = true;
+
+    CloseServiceHandle(svc);
+    CloseServiceHandle(scm);
+
+    if (success)
+        MessageBoxW(nullptr, L"Service uninstalled successfully.", L"Success", MB_OK | MB_ICONINFORMATION);
+    else
+        MessageBoxW(nullptr, L"Failed to uninstall service.", L"Error", MB_OK | MB_ICONERROR);
+
+    return success;
 }
 
 bool Uninstall()
@@ -151,11 +162,24 @@ bool Uninstall()
         RegCloseKey(hKey);
     }
 
+    bool svcSuccess = false;
+
+    if (UninstallService())
+    {
+        MessageBoxExA(NULL, "wnq-svc service removed.", "Uninstall Complete", MB_OK | MB_ICONINFORMATION, 0);
+        svcSuccess = true;
+    }
+    else
+    {
+        MessageBoxExA(NULL, "Failed to remove wnq-svc service.\nTry running your terminal as administrator.", "Uninstall Failed", MB_OK | MB_ICONERROR, 0);
+    }
+
     if (success)
         MessageBoxExA(NULL, "Removed from startup.", "Uninstall Complete", MB_OK | MB_ICONINFORMATION, 0);
     else
         MessageBoxExA(NULL, "Failed to remove from startup.", "Uninstall Failed", MB_OK | MB_ICONERROR, 0);
-    return success;
+
+    return success && svcSuccess;
 }
 
 void RegisterStartup(HINSTANCE hInstance, const std::wstring &wideCmdLine)
@@ -193,6 +217,38 @@ void RegisterStartup(HINSTANCE hInstance, const std::wstring &wideCmdLine)
     print("[DEBUG] %s", (result == ERROR_SUCCESS) ? "Registry key set successfully." : "Failed to set registry key.");
 
     RegCloseKey(hKey);
+
+    print("[DEBUG] Attempting to run wnq-svc.exe as administrator.");
+
+    wchar_t currentDir[MAX_PATH];
+    if (GetCurrentDirectoryW(MAX_PATH, currentDir) != 0)
+    {
+        std::wstring svcPath = std::wstring(currentDir) + L"\\wnq-svc.exe";
+
+        SHELLEXECUTEINFOW shExInfo = {0};
+        shExInfo.cbSize = sizeof(shExInfo);
+        shExInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+        shExInfo.hwnd = nullptr;
+        shExInfo.lpVerb = L"runas";
+        shExInfo.lpFile = svcPath.c_str();
+        shExInfo.lpParameters = L"";
+        shExInfo.nShow = SW_NORMAL;
+
+        if (ShellExecuteExW(&shExInfo))
+        {
+            print("[DEBUG] Service executable launched as administrator.");
+            if (shExInfo.hProcess)
+                CloseHandle(shExInfo.hProcess);
+        }
+        else
+        {
+            print("[DEBUG] Failed to launch service executable as administrator.");
+        }
+    }
+    else
+    {
+        print("[DEBUG] Failed to get current directory.");
+    }
 }
 
 #endif // HOOKS_HPP

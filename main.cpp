@@ -15,13 +15,13 @@ bool hoverwFocusSetting = false;
 bool isDebugMode = false;
 bool wKeyPressed = false;
 bool enableForceKeybind = false;
+bool dontOverFind = false;
 
 HHOOK kbHook;
 HWND lastHoverWindow = NULL;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-
     // Kill existing instances
     DWORD currentProcessId = GetCurrentProcessId();
     PROCESSENTRY32W processEntry{};
@@ -61,14 +61,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     // Help arg
-    if (wideCmdLine.find(L"--help") != std::wstring::npos)
+    if (wideCmdLine.find(L"--help") != std::wstring::npos || wideCmdLine.find(L"-h") != std::wstring::npos )
     {
         AttachToConsole();
 
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
 
-        print("Usage: winq-remapper.exe [--debug] [--mode <hover|hovfocus|default>] [--uninstall]");
+        print(R"(wnq-rmp - Remaps Windows + Q to close the current window
+
+USAGE:
+  wnq-rmp.exe [OPTIONS]
+
+OPTIONS:
+  --mode <mode>              Set the window detection mode
+                             - default: Close focused window only
+                             - hover: Close the currently hovered window
+                             - hovfocus: Focus window on hover (WIP)
+                             Default: default
+
+  --enable-force-keybind    Enable Windows + Shift + Q to force close processes
+                             Warning: Uses TerminateProcess() forcefully
+
+  --dontoverfind            Prevent over-searching window hierarchy
+                             Fixes issues with File Explorer closing completely
+
+  --debug                   Enable debug mode with console output
+
+  --attach                  Attach to parent console (for terminal usage)
+
+  --uninstall               Uninstall the application services and remove from startup
+
+  --help, -h                Show this help message
+
+EXAMPLES:
+  wnq-rmp.exe --mode hover
+  wnq-rmp.exe --dontoverfind --mode hover
+  wnq-rmp.exe --debug --mode hover --enable-force-keybind
+
+REQUIREMENTS:
+  - For elevated window closing, the service must be active)");
 
         SetConsoleTextAttribute(hConsole, 7);
         return 0;
@@ -87,6 +119,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Debug arg
     if (wideCmdLine.find(L"--debug") != std::wstring::npos)
         isDebugMode = true;
+
+    // Don't over find
+    if (wideCmdLine.find(L"--dontoverfind") != std::wstring::npos)
+        dontOverFind = true;    
+    
 
     // Mode arg
     if (wideCmdLine.find(L"--mode") != std::wstring::npos)
@@ -160,6 +197,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             freopen_s((FILE **)stdout, "CONOUT$", "w", stdout);
         }
         print("[DEBUG] Mode: %ls", mode.c_str());
+        print("[DEBUG] Enable force keybind: %d", enableForceKeybind);
+        print("[DEBUG] Don't overfind setting: %d", dontOverFind)
         print("[DEBUG] Hover setting: %d", hoverSetting);
         print("[DEBUG] Hover with focus setting: %d", hoverwFocusSetting);
         print("[DEBUG] Full command line: %ls", wideCmdLine.c_str());
@@ -176,7 +215,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     kbHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
     if (!kbHook)
+    {
         return 1;
+    }
 
     SetTimer(NULL, 1, 50, HoverTimerProc);
 
